@@ -1,0 +1,6 @@
+{
+  "name": "LexiBill AI",
+  "description": "An AI-driven chatbot for logging time entries and generating detailed billing reports for legal professionals. It uses conversational prompts and AI to streamline administrative workflows.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
