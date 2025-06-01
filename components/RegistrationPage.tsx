@@ -1,15 +1,15 @@
+// src/components/RegistrationPage.tsx
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from '../services/firebaseConfig';
 import { useNavigate, Link } from 'react-router-dom';
-import { auth } from '../services/firebaseConfig'; // Assuming firebaseConfig.ts is in src/services
 
 const RegistrationPage: React.FC = () => {
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState(''); // Optional
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -37,9 +37,8 @@ const RegistrationPage: React.FC = () => {
     setLoading(true);
     const provider = new GoogleAuthProvider();
     try {
-      // You can use signInWithPopup for both sign-in and registration with Google
       await signInWithPopup(auth, provider);
-      navigate('/'); // Navigate to home/dashboard
+      navigate('/'); // Navigate to home/dashboard (Google sign-up often logs the user in directly)
     } catch (err: any) {
       setError(err.message);
       console.error("Google Sign-Up error:", err);
@@ -89,7 +88,7 @@ const RegistrationPage: React.FC = () => {
           <button
             type="submit"
             style={{ width: '100%', padding: '12px', borderRadius: '4px', border: 'none', backgroundColor: '#00695C', color: 'white', fontSize: '16px', cursor: 'pointer' }}
-            disabled={loading}
+            disabled={loading || !email || !password}
           >
             {loading ? 'Registering...' : 'Register'}
           </button>

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../services/firebaseConfig';
-import { SpinnerIcon } from './icons/SpinnerIcon'; // Assuming you have a spinner icon
+import { SpinnerIcon } from './icons/SpinnerIcon';
 
 const ProtectedRoute: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -19,8 +19,8 @@ const ProtectedRoute: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <SpinnerIcon className="animate-spin h-10 w-10 text-primary" />
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#1A3A3A' }}>
+        <SpinnerIcon className="h-10 w-10 text-green-400" />
       </div>
     );
   }

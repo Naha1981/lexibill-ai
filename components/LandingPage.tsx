@@ -1,136 +1,88 @@
+// src/components/LandingPage.tsx
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link
-import { ClockIcon, ReceiptIcon, RobotIcon, LexiBillLogoIcon } from './icons'; // Added LexiBillLogoIcon
+import { Link } from 'react-router-dom';
+import { LexiBillLogoIcon } from './icons/LexiBillLogoIcon'; // Assuming this icon exists
+import { ReceiptIcon } from './icons/ReceiptIcon'; // Assuming this icon exists
 
 const LandingPage: React.FC<{ onGetStarted: () => void }> = ({ onGetStarted }) => {
-  const heroStyle = {
-    backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAvNLJVAqGC1dA9kHZeZdTLLXQbXjUXGQRRdAMPUcumpIDqQEvcz5bvDrd1ECt2l-MCN4bflVekrrDhtDgKrshcskCJknhujD894xWMSehrcLzWjPXHG_nf_Xqpm3puSrZOARIgdsC2th84-xTchov0skIhSkr3hmAabXNiLKcFZ39SFr-B67BQZGLwPZqAECx2h5eVPpW6NFeL89N6ugeNi3Fdqe82VfQOlBKKpvBj7Xd8UzZnBPLqPGDZUkCKBhGII4U_BfVQt3Fc")',
-  };
-
   return (
-    <div
-      className="relative flex size-full min-h-screen flex-col bg-gradient-to-br from-gray-900 to-green-900 text-white group/design-root overflow-x-hidden"
-      // Font family is globally set in index.html body
-    >
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-green-900 text-white flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 @[480px]:p-6">
-        <div className="flex items-center space-x-3">
-          <LexiBillLogoIcon className="h-10 w-auto" />
-          <span className="text-2xl font-bold">LexiBill.ai</span>
-        </div>
-        <nav className="space-x-6 flex items-center">
-          <Link to="/login" className="hover:text-green-300 transition duration-300">Login</Link>
-          <Link to="/register" className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out">
-            Sign Up
-          </Link>
-        </nav>
-      </div>
-
-      <div> {/* Main Content Wrapper */}
-        <div className="@container">
-          <div className="@[480px]:p-4">
-            <div
-              className="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-xl items-start justify-end px-4 pb-10 @[480px]:px-10"
-              style={heroStyle}
-            >
-              <div className="flex flex-col gap-2 text-left">
-                <h1
-                  className="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
-                >
-                  LexiBill AI
-                </h1>
-                <h2 className="text-white text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
-                  Clarity in Every Bill — Because Happy Clients Matter.
-                </h2>
-              </div>
-              <button
-                onClick={onGetStarted}
-                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#019863] text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
-              >
-                <span className="truncate">Get Started</span>
-              </button>
-            </div>
+      <header className="p-4 md:p-6">
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <LexiBillLogoIcon className="h-10 w-auto" />
+            <span className="text-2xl font-bold">LexiBill.ai</span>
           </div>
-        </div>
-        <div className="flex flex-col gap-10 px-4 py-10 @container">
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-4">
-              <h1
-                className="text-white tracking-light text-[32px] font-bold leading-tight @[480px]:text-4xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em] max-w-[720px]"
-              >
-                Key Features
-              </h1>
-              <p className="text-white text-base font-normal leading-normal max-w-[720px]">Our system offers a range of features to enhance your billing process.</p>
-            </div>
-            <button
-              onClick={onGetStarted} // Changed to also call onGetStarted
-              className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#019863] text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] w-fit"
+          <nav className="space-x-4 sm:space-x-6 flex items-center">
+            <Link to="/login" className="text-sm sm:text-base hover:text-green-300 transition duration-300">
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="text-sm sm:text-base bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg transition duration-300 ease-in-out"
             >
-              <span className="truncate">Learn More</span>
+              Sign Up
+            </Link>
+          </nav>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <main className="flex-grow flex flex-col items-center justify-center text-center p-4">
+        <div className="max-w-3xl">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6">
+            Intelligent Invoicing with <span className="text-green-400">LexiBill.ai</span>
+          </h1>
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-10">
+            Streamline your billing process with AI-powered insights, automated invoice generation, and smart financial reporting.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
+            <button
+              onClick={onGetStarted}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300 ease-in-out transform hover:scale-105 w-full sm:w-auto"
+            >
+              Get Started
+            </button>
+            <button
+              onClick={onGetStarted} // Also calls onGetStarted
+              className="bg-transparent hover:bg-green-700 text-green-300 font-semibold hover:text-white py-3 px-8 border border-green-400 hover:border-transparent rounded-lg text-lg transition duration-300 ease-in-out w-full sm:w-auto"
+            >
+              Learn More
             </button>
           </div>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-0">
-            <div className="flex flex-1 gap-3 rounded-lg border border-[#2f6a55] bg-[#17352b] p-4 flex-col">
-              <div className="text-white">
-                <ClockIcon className="w-[24px] h-[24px]" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <h2 className="text-white text-base font-bold leading-tight">Automated Time Tracking</h2>
-                <p className="text-[#8ecdb7] text-sm font-normal leading-normal">Effortlessly track billable hours with our AI-powered time tracking.</p>
-              </div>
+        </div>
+      </main>
+
+      {/* Placeholder for Features Section - can be expanded */}
+      <section className="py-12 md:py-16 bg-gray-800 bg-opacity-50">
+        <div className="container mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-8">Why Choose LexiBill.ai?</h2>
+          <div className="grid md:grid-cols-3 gap-8 px-4">
+            <div className="p-6 bg-gray-700 rounded-lg bg-opacity-70">
+              <ReceiptIcon className="h-12 w-12 mx-auto mb-4 text-green-400" /> {/* Assuming ReceiptIcon */}
+              <h3 className="text-xl font-semibold mb-2">Automated Invoicing</h3>
+              <p className="text-gray-400">Save time with invoices generated and sent automatically.</p>
             </div>
-            <div className="flex flex-1 gap-3 rounded-lg border border-[#2f6a55] bg-[#17352b] p-4 flex-col">
-              <div className="text-white">
-                <ReceiptIcon className="w-[24px] h-[24px]" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <h2 className="text-white text-base font-bold leading-tight">Smart Billing</h2>
-                <p className="text-[#8ecdb7] text-sm font-normal leading-normal">Generate accurate invoices and manage billing with ease.</p>
-              </div>
+            <div className="p-6 bg-gray-700 rounded-lg bg-opacity-70">
+               {/* Placeholder for another icon */}
+              <svg className="h-12 w-12 mx-auto mb-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <h3 className="text-xl font-semibold mb-2">Smart Analytics</h3>
+              <p className="text-gray-400">Gain insights into your cash flow and client billing patterns.</p>
             </div>
-            <div className="flex flex-1 gap-3 rounded-lg border border-[#2f6a55] bg-[#17352b] p-4 flex-col">
-              <div className="text-white">
-                <RobotIcon className="w-[24px] h-[24px]" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <h2 className="text-white text-base font-bold leading-tight">AI Assistance</h2>
-                <p className="text-[#8ecdb7] text-sm font-normal leading-normal">Get instant support and insights from our AI assistant.</p>
-              </div>
+            <div className="p-6 bg-gray-700 rounded-lg bg-opacity-70">
+               {/* Placeholder for another icon */}
+              <svg className="h-12 w-12 mx-auto mb-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+              <h3 className="text-xl font-semibold mb-2">Secure & Reliable</h3>
+              <p className="text-gray-400">Your financial data is protected with top-tier security.</p>
             </div>
           </div>
         </div>
-        <div className="@container">
-          <div className="flex flex-col justify-end gap-6 px-4 py-10 @[480px]:gap-8 @[480px]:px-10 @[480px]:py-20">
-            <div className="flex flex-col gap-2 text-center">
-              <h1
-                className="text-white tracking-light text-[32px] font-bold leading-tight @[480px]:text-4xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em] max-w-[720px] mx-auto" // Added mx-auto for centering
-              >
-                Ready to Transform Your Billing?
-              </h1>
-              <p className="text-white text-base font-normal leading-normal max-w-[720px] mx-auto"> {/* Added mx-auto */}
-                Get in touch to learn how our system can benefit your legal practice.
-              </p>
-            </div>
-            <div className="flex flex-1 justify-center">
-              <div className="flex justify-center">
-                <button
-                  onClick={onGetStarted} // Make this button functional
-                  className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#019863] text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] grow"
-                >
-                  <span className="truncate">Get Started</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Footer Area */}
-      <footer className="bg-[#10231c] text-center py-4">
-        <p className="text-[#8ecdb7] text-xs">
-          Built By: Thabiso
-        </p>
-        <div className="h-5 bg-[#10231c]"></div> {/* Original bottom padding */}
+      </section>
+
+      {/* Footer */}
+      <footer className="p-6 text-center text-gray-400 text-sm">
+        © {new Date().getFullYear()} LexiBill.ai. All rights reserved.
       </footer>
     </div>
   );

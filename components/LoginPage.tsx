@@ -1,6 +1,7 @@
+// src/components/LoginPage.tsx
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from '../services/firebaseConfig'; // Assuming firebaseConfig.ts is in src/services
+import { auth } from '../services/firebaseConfig';
 import { useNavigate, Link } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
@@ -8,15 +9,14 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // TODO: Redirect to app dashboard or home page
       navigate('/'); // Navigate to home/dashboard
     } catch (err: any) {
       setError(err.message);
@@ -72,7 +72,7 @@ const LoginPage: React.FC = () => {
           <button
             type="submit"
             style={{ width: '100%', padding: '12px', borderRadius: '4px', border: 'none', backgroundColor: '#00695C', color: 'white', fontSize: '16px', cursor: 'pointer' }}
-            disabled={loading}
+            disabled={loading || !email || !password}
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
