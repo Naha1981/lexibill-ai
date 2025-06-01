@@ -7,7 +7,7 @@ export interface Client {
 }
 
 export interface Matter {
-  id: string;
+  id:string;
   clientID: string; // Foreign key to Client
   name: string;
   specificRate?: number; // Hourly rate in ZAR, overrides client defaultRate if set
@@ -27,5 +27,62 @@ export interface TimeEntry {
   isBilled?: boolean; // Has this entry been included in an invoice?
 }
 
-// TaskType enum is removed as AI generates free-form narrative.
-// ChatMessage, ChatFlowState, CurrentEntryBuilder are removed.
+// Data structure for submitting the time entry form
+export interface TimeEntryFormSubmitData {
+  clientID: string;
+  matterID?: string;       // ID if an existing matter is chosen/matched from datalist
+  newMatterName?: string;  // Name if a new matter is being created (typed directly)
+  date: Date;
+  taskSummary: string;
+  duration: number;
+  rate: number;
+  notes?: string;
+}
+
+// --- DASHBOARD SPECIFIC TYPES ---
+
+export interface BillingSummary {
+  weeklyTotalAmount: number;
+  monthlyTotalAmount: number;
+  weeklyTotalHours: number;
+  monthlyTotalHours: number;
+}
+
+export interface BilledUnbilledDataPoint {
+  name: 'Billed' | 'Unbilled';
+  value: number; // Typically hours
+  fill: string; // Color for the chart segment
+}
+
+export interface TopMatterData {
+  id: string;
+  name: string;
+  clientName: string;
+  totalHours: number;
+  totalAmount: number;
+}
+
+export interface RevenueDataPoint {
+  month: string; // e.g., "Jan '23"
+  revenue: number;
+}
+
+export interface RecentEntryDisplayData {
+  id: string;
+  date: string; // Formatted date
+  summary: string;
+  duration: number;
+  matterName: string;
+  clientName: string;
+  amount: number;
+}
+
+export type ReminderType = 'unbilled_entry_old' | 'matter_stale_unbilled';
+
+export interface BillingReminder {
+  id: string; // Unique ID for the reminder (e.g., entry.id or matter.id + type)
+  type: ReminderType;
+  message: string;
+  relatedId: string; // ID of the TimeEntry or Matter
+  date?: Date; // Relevant date for sorting or display
+}

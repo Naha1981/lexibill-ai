@@ -9,3 +9,4 @@ export { default as LexiBillLogoIcon } from './LexiBillLogoIcon'; // Added new l
 export { default as ClockIcon } from './ClockIcon';
 export { default as ReceiptIcon } from './ReceiptIcon';
 export { default as RobotIcon } from './RobotIcon';
+export { default as AlertTriangleIcon } from './AlertTriangleIcon'; // Export new icon

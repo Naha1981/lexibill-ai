@@ -1,18 +1,34 @@
 
 import React, { useState, useEffect } from 'react';
-import { TimeEntry, Client, Matter } from '../types'; // Assuming these might be needed for context display
+// Removed TimeEntry, Client, Matter imports as specific fields are now in NarrativePreviewData
 import { ArrowLeftIcon, SpinnerIcon, LexiBillLogoIcon } from './icons';
 
-// This combines the original form data with the generated narrative for the preview
-export interface NarrativePreviewData extends Omit<TimeEntry, 'id' | 'billingNarrative' | 'isBilled'> {
+// This interface now includes all necessary data for preview and subsequent approval,
+// including details for potentially creating a new matter.
+export interface NarrativePreviewData {
+  clientID: string;
+  matterID: string; // Will be the ID of an existing matter or a pre-generated ID for a new one
+  date: Date;
+  taskSummary: string;
+  duration: number;
+  rate: number;
+  notes?: string;
+  
+  // Contextual and AI-related data
+  clientName: string; // Name of the client for display
+  matterName: string; // Name of the matter (existing or new) for display and used in narrative
   generatedNarrative: string;
+
+  // Flags for handling new matter creation
+  isNewMatterPending?: boolean;
+  newMatterNameIfPending?: string; // The name of the new matter, if pending
 }
 
 interface BillingNarrativePreviewProps {
   narrativeData: NarrativePreviewData;
-  onApprove: (finalNarrative: string, originalEntryData: Omit<NarrativePreviewData, 'generatedNarrative'>) => void;
+  onApprove: (finalNarrative: string, approvedData: NarrativePreviewData) => void; // Pass full NarrativePreviewData back
   onCancel: () => void;
-  isLoading: boolean; // For showing spinner during approval if any async action happens
+  isLoading: boolean;
 }
 
 const BillingNarrativePreview: React.FC<BillingNarrativePreviewProps> = ({
@@ -28,8 +44,8 @@ const BillingNarrativePreview: React.FC<BillingNarrativePreviewProps> = ({
   }, [narrativeData.generatedNarrative]);
 
   const handleApproveClick = () => {
-    const { generatedNarrative, ...originalEntryData } = narrativeData;
-    onApprove(editableNarrative, originalEntryData);
+    // Pass the full narrativeData object along with the potentially edited narrative
+    onApprove(editableNarrative, narrativeData);
   };
   
   const commonLabelClasses = "block text-sm font-medium text-[#8ecdb7] mb-1";
@@ -73,6 +89,14 @@ const BillingNarrativePreview: React.FC<BillingNarrativePreviewProps> = ({
           {/* Display original entry details for context */}
           <div className="mb-6 p-4 bg-[#214a3c] rounded-lg space-y-2">
             <h3 className="text-lg font-semibold text-white mb-2">Original Entry Details:</h3>
+             <div> {/* Display Client and Matter names from narrativeData */}
+              <span className={`${commonLabelClasses} inline-block mr-2`}>Client:</span>
+              <span className={commonValueClasses}>{narrativeData.clientName}</span>
+            </div>
+            <div>
+              <span className={`${commonLabelClasses} inline-block mr-2`}>Matter:</span>
+              <span className={commonValueClasses}>{narrativeData.matterName} {narrativeData.isNewMatterPending ? "(New)" : ""}</span>
+            </div>
             <div>
               <span className={`${commonLabelClasses} inline-block mr-2`}>Date:</span>
               <span className={commonValueClasses}>{new Date(narrativeData.date).toLocaleDateString('en-CA')}</span>

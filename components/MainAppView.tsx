@@ -1,20 +1,30 @@
 
-import React, { useState } from 'react';
-import { Client, Matter, TimeEntry } from '../types';
+import React, { useState, useMemo } from 'react';
+import { Client, Matter, TimeEntry, TimeEntryFormSubmitData } from '../types';
 import TimeEntryForm from './TimeEntryForm';
-import { LexiBillLogoIcon, ArrowLeftIcon, ReceiptIcon } from './icons'; // Assuming icons are relevant
-import { BOT_NAME } from '../constants'; // Added import for BOT_NAME
+import { LexiBillLogoIcon, ArrowLeftIcon, ReceiptIcon } from './icons';
+import { BOT_NAME } from '../constants';
+
+// Dashboard specific imports
+import { calculateBillingSummaries, getBilledVsUnbilledData, getTopActiveMatters, getRevenueTrendData, getRecentTimeEntriesList, getBillingReminders } from '../utils/dashboardCalculations';
+import BillingSummaryWidget from './dashboard/BillingSummaryWidget';
+import BilledUnbilledPieChart from './dashboard/BilledUnbilledPieChart';
+import TopMattersWidget from './dashboard/TopMattersWidget';
+import RevenueTrendChartWidget from './dashboard/RevenueTrendChartWidget';
+import RecentEntriesWidget from './dashboard/RecentEntriesWidget';
+import BillingRemindersWidget from './dashboard/BillingRemindersWidget';
+
 
 interface MainAppViewProps {
   clients: Client[];
   matters: Matter[];
   timeEntries: TimeEntry[];
-  onTimeEntrySubmit: (formData: Omit<TimeEntry, 'id' | 'billingNarrative' | 'isBilled'>) => void;
+  onTimeEntrySubmit: (formData: TimeEntryFormSubmitData) => void;
   onNavigateHome: () => void;
-  isLoading: boolean;
+  isLoadingGlobal: boolean; // Renamed from isLoading to avoid conflict
   onShowReportForMatter: (matterId: string) => void;
-  onAddClient: (client: Client) => void; // Placeholder
-  onAddMatter: (matter: Matter) => void;   // Placeholder
+  onAddClient: (client: Client) => void;
+  onAddMatter: (matter: Matter) => void;
 }
 
 const MainAppView: React.FC<MainAppViewProps> = ({
@@ -23,29 +33,38 @@ const MainAppView: React.FC<MainAppViewProps> = ({
   timeEntries,
   onTimeEntrySubmit,
   onNavigateHome,
-  isLoading,
+  isLoadingGlobal,
   onShowReportForMatter,
-  onAddClient,
-  onAddMatter,
+  // onAddClient, // Kept for future use
+  // onAddMatter,  // Kept for future use
 }) => {
-  // Basic state for showing/hiding client/matter forms (example)
-  const [showAddClientForm, setShowAddClientForm] = useState(false);
-  const [showAddMatterForm, setShowAddMatterForm] = useState(false);
+  // const [showAddClientForm, setShowAddClientForm] = useState(false); // Future use
+  // const [showAddMatterForm, setShowAddMatterForm] = useState(false); // Future use
 
-  // Group time entries by matter for display
-  const entriesByMatter: { [matterId: string]: TimeEntry[] } = timeEntries.reduce((acc, entry) => {
-    if (!acc[entry.matterID]) {
-      acc[entry.matterID] = [];
-    }
-    acc[entry.matterID].push(entry);
-    return acc;
-  }, {} as { [matterId: string]: TimeEntry[] });
+  // --- Dashboard Data Calculations ---
+  const billingSummary = useMemo(() => calculateBillingSummaries(timeEntries), [timeEntries]);
+  const billedUnbilledData = useMemo(() => getBilledVsUnbilledData(timeEntries), [timeEntries]);
+  const topActiveMatters = useMemo(() => getTopActiveMatters(timeEntries, matters, clients, 5), [timeEntries, matters, clients]);
+  const revenueTrendData = useMemo(() => getRevenueTrendData(timeEntries, 6), [timeEntries]);
+  const recentEntriesList = useMemo(() => getRecentTimeEntriesList(timeEntries, matters, clients, 5), [timeEntries, matters, clients]);
+  const billingReminders = useMemo(() => getBillingReminders(timeEntries, matters, clients), [timeEntries, matters, clients]);
+
+  // For existing "Matters Overview" section
+  const entriesByMatter: { [matterId: string]: TimeEntry[] } = useMemo(() => {
+    return timeEntries.reduce((acc, entry) => {
+      if (!acc[entry.matterID]) {
+        acc[entry.matterID] = [];
+      }
+      acc[entry.matterID].push(entry);
+      return acc;
+    }, {} as { [matterId: string]: TimeEntry[] });
+  }, [timeEntries]);
 
 
   return (
     <div className="relative flex flex-col size-full min-h-screen bg-[#10231c] justify-start overflow-x-hidden">
       {/* Header */}
-      <header className="flex items-center bg-[#10231c] p-4 pb-2 justify-between sticky top-0 z-10 w-full">
+      <header className="flex items-center bg-[#10231c] p-4 pb-2 justify-between sticky top-0 z-20 w-full">
         <button 
           onClick={onNavigateHome} 
           className="text-white flex size-12 shrink-0 items-center justify-center hover:bg-[#1a3a2f] rounded-full transition-colors" 
@@ -66,82 +85,100 @@ const MainAppView: React.FC<MainAppViewProps> = ({
           {/* Spacer */}
         </div>
       </header>
-      <div className="px-4 pt-1 pb-3 bg-[#10231c] sticky top-[calc(4rem+0.5rem+1.5rem)] z-10 w-full"> {/* Adjust top based on header height */}
+      <div className="px-4 pt-1 pb-3 bg-[#10231c] sticky top-[calc(4rem+0.5rem+1.5rem)] z-20 w-full">
         <div
           className="h-px bg-[#8ecdb7] animate-draw-line-lr"
           style={{ transformOrigin: 'left' }}
         ></div>
       </div>
 
-      <main className="flex-grow overflow-y-auto chat-scrollbar px-4 py-6 space-y-8">
+      <main className="flex-grow overflow-y-auto chat-scrollbar px-4 py-6 space-y-8 z-0"> {/* Ensure main content is below sticky header/divider */}
+        
+        {/* === LAWYER DASHBOARD SECTION === */}
+        <section className="pb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">At a Glance</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <BillingSummaryWidget summary={billingSummary} />
+            <BilledUnbilledPieChart data={billedUnbilledData} />
+            <RecentEntriesWidget entries={recentEntriesList} />
+            <TopMattersWidget matters={topActiveMatters} /> {/* lg:col-span-2 by default in its own definition */}
+            <BillingRemindersWidget reminders={billingReminders} /> {/* lg:col-span-2 by default in its own definition */}
+            <RevenueTrendChartWidget data={revenueTrendData} /> {/* lg:col-span-3 by default in its own definition */}
+          </div>
+        </section>
+
         {/* Time Entry Section */}
-        <section className="bg-[#17352b] p-6 rounded-xl shadow-lg border border-[#2f6a55]">
-          <h2 className="text-2xl font-semibold text-white mb-4">Log New Time Entry</h2>
+        <section className="bg-[#17352b] p-4 sm:p-6 rounded-xl shadow-lg border border-[#2f6a55]">
+          <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4">Log New Time Entry</h2>
           <TimeEntryForm
             clients={clients}
             matters={matters}
             onSubmit={onTimeEntrySubmit}
-            isLoading={isLoading}
+            isLoading={isLoadingGlobal} // Use the global loading state
           />
         </section>
 
-        {/* Client/Matter Management (Basic Example) - Could be modals or separate views */}
-        {/* 
-        <section className="bg-[#17352b] p-6 rounded-xl shadow-lg border border-[#2f6a55]">
-          <h2 className="text-2xl font-semibold text-white mb-4">Manage Clients & Matters</h2>
-          <div className="space-x-2">
-            <button onClick={() => setShowAddClientForm(true)} className="px-4 py-2 bg-[#019863] text-white rounded-lg hover:bg-[#017a50]">Add Client</button>
-            <button onClick={() => setShowAddMatterForm(true)} className="px-4 py-2 bg-[#019863] text-white rounded-lg hover:bg-[#017a50]">Add Matter</button>
-          </div>
-          {showAddClientForm && <p className="text-white mt-2">Client form would appear here...</p>}
-          {showAddMatterForm && <p className="text-white mt-2">Matter form would appear here...</p>}
-        </section>
-        */}
-
-        {/* Recent Time Entries / Matters Overview */}
-        <section className="bg-[#17352b] p-6 rounded-xl shadow-lg border border-[#2f6a55]">
-          <h2 className="text-2xl font-semibold text-white mb-4">Matters Overview & Recent Entries</h2>
+        {/* Matters Overview Section (Existing) */}
+        <section className="bg-[#17352b] p-4 sm:p-6 rounded-xl shadow-lg border border-[#2f6a55]">
+          <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4">Matters Overview</h2>
           {Object.keys(entriesByMatter).length === 0 && timeEntries.length === 0 && (
             <p className="text-[#8ecdb7]">No time entries logged yet. Use the form above to get started.</p>
           )}
-          {Object.keys(entriesByMatter).map(matterId => {
-            const matter = matters.find(m => m.id === matterId);
-            const client = clients.find(c => c.id === matter?.clientID);
-            const entriesForThisMatter = entriesByMatter[matterId];
-            const totalHours = entriesForThisMatter.reduce((sum, entry) => sum + entry.duration, 0);
+          {Object.keys(entriesByMatter).length > 0 && (
+            <div className="space-y-4">
+            {Object.keys(entriesByMatter).map(matterId => {
+              const matter = matters.find(m => m.id === matterId);
+              const client = clients.find(c => c.id === matter?.clientID);
+              const entriesForThisMatter = entriesByMatter[matterId];
+              const totalHours = entriesForThisMatter.reduce((sum, entry) => sum + entry.duration, 0);
+              const totalAmount = entriesForThisMatter.reduce((sum, entry) => sum + (entry.duration * entry.rate), 0);
 
-            return (
-              <div key={matterId} className="mb-6 p-4 bg-[#214a3c] rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                    <div>
-                        <h3 className="text-xl font-medium text-white">{matter?.name || 'Unknown Matter'}</h3>
-                        <p className="text-sm text-[#8ecdb7]">{client?.name || 'Unknown Client'}</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <span className="text-sm text-white bg-[#019863] px-2 py-1 rounded">
-                            Total: {totalHours.toFixed(1)} hrs
-                        </span>
-                        <button
-                            onClick={() => onShowReportForMatter(matterId)}
-                            className="p-2 text-[#8ecdb7] hover:text-white transition-colors rounded-full hover:bg-[#1a3a2f]"
-                            title="Generate Report for this Matter"
-                            aria-label={`Generate Report for ${matter?.name}`}
-                        >
-                            <ReceiptIcon className="w-5 h-5" />
-                        </button>
-                    </div>
+
+              return (
+                <div key={matterId} className="p-3 sm:p-4 bg-[#214a3c] rounded-lg">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+                      <div className="mb-2 sm:mb-0">
+                          <h3 className="text-lg sm:text-xl font-medium text-white">{matter?.name || 'Unknown Matter'}</h3>
+                          <p className="text-sm text-[#8ecdb7]">{client?.name || 'Unknown Client'}</p>
+                      </div>
+                      <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-between sm:justify-end">
+                          <div className="text-right">
+                            <p className="text-sm text-white bg-[#019863] px-2 py-1 rounded">
+                                Total: {totalHours.toFixed(1)} hrs
+                            </p>
+                            <p className="text-xs text-[#b2dfdb] mt-1">Value: R {totalAmount.toFixed(2)}</p>
+                          </div>
+                          <button
+                              onClick={() => onShowReportForMatter(matterId)}
+                              className="p-2 text-[#8ecdb7] hover:text-white transition-colors rounded-full hover:bg-[#1a3a2f]"
+                              title="Generate Report for this Matter"
+                              aria-label={`Generate Report for ${matter?.name}`}
+                          >
+                              <ReceiptIcon className="w-5 h-5" />
+                          </button>
+                      </div>
+                  </div>
+                  {entriesForThisMatter.length > 0 && (
+                    <details className="group">
+                        <summary className="text-xs text-[#8ecdb7] cursor-pointer group-hover:text-white list-none">
+                            <span className="group-open:hidden">Show recent entries ({Math.min(entriesForThisMatter.length, 3)})</span>
+                            <span className="hidden group-open:inline">Hide recent entries</span>
+                        </summary>
+                        <ul className="mt-2 space-y-1 max-h-48 overflow-y-auto chat-scrollbar pr-2">
+                        {entriesForThisMatter.slice(0, 3).map(entry => ( 
+                            <li key={entry.id} className="text-xs text-[#b2dfdb] border-b border-[#2f6a55]/50 py-1 last:border-b-0">
+                            {new Date(entry.date).toLocaleDateString('en-CA')}: {entry.taskSummary.substring(0,50)}{entry.taskSummary.length > 50 ? '...' : ''} ({entry.duration}h)
+                            </li>
+                        ))}
+                        {entriesForThisMatter.length > 3 && <li className="text-xs text-[#8ecdb7] text-center pt-1">...and {entriesForThisMatter.length - 3} more entries. Click "Generate Report" to see all.</li>}
+                        </ul>
+                    </details>
+                  )}
                 </div>
-                <ul className="space-y-1 max-h-60 overflow-y-auto chat-scrollbar pr-2">
-                  {entriesForThisMatter.slice(0, 5).map(entry => ( // Show last 5 entries for brevity
-                    <li key={entry.id} className="text-xs text-[#b2dfdb] border-b border-[#2f6a55] py-1 last:border-b-0">
-                      {entry.date.toLocaleDateString('en-CA')}: {entry.taskSummary.substring(0,50)}{entry.taskSummary.length > 50 ? '...' : ''} ({entry.duration}h)
-                    </li>
-                  ))}
-                   {entriesForThisMatter.length > 5 && <li className="text-xs text-[#8ecdb7] text-center pt-1">...and {entriesForThisMatter.length - 5} more entries.</li>}
-                </ul>
-              </div>
-            );
-          })}
+              );
+            })}
+            </div>
+          )}
         </section>
       </main>
 
