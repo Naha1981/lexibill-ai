@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import DashboardCard from './DashboardCard';
 import { BilledUnbilledDataPoint } from '../../types';
+import { TimePastSixtyIcon } from '../icons';
 
 interface BilledUnbilledPieChartProps {
   data: BilledUnbilledDataPoint[];
@@ -12,7 +12,7 @@ const BilledUnbilledPieChart: React.FC<BilledUnbilledPieChartProps> = ({ data })
   const totalHours = data.reduce((sum, item) => sum + item.value, 0);
   if (totalHours === 0) {
     return (
-        <DashboardCard title="Time Status">
+        <DashboardCard title="Time Status" titleIcon={<TimePastSixtyIcon className="w-5 h-5" />}>
             <div className="flex items-center justify-center h-full">
                 <p className="text-[#8ecdb7]">No time entries to display status.</p>
             </div>
@@ -20,7 +20,7 @@ const BilledUnbilledPieChart: React.FC<BilledUnbilledPieChartProps> = ({ data })
     );
   }
   return (
-    <DashboardCard title="Time Status (Hours)">
+    <DashboardCard title="Time Status (Hours)" titleIcon={<TimePastSixtyIcon className="w-5 h-5" />}>
       <ResponsiveContainer width="100%" height={200}>
         <PieChart>
           <Pie

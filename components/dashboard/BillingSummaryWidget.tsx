@@ -1,8 +1,7 @@
-
 import React from 'react';
 import DashboardCard from './DashboardCard';
 import { BillingSummary } from '../../types';
-import { ClockIcon, ReceiptIcon } from '../icons'; // Re-using existing icons
+import { BillIcon } from '../icons'; // Changed from ReceiptIcon
 
 interface BillingSummaryWidgetProps {
   summary: BillingSummary;
@@ -13,7 +12,7 @@ const BillingSummaryWidget: React.FC<BillingSummaryWidgetProps> = ({ summary }) 
   const formatHours = (hours: number) => `${hours.toFixed(1)} hr${hours !== 1 ? 's' : ''}`;
 
   return (
-    <DashboardCard title="Billing Summary" titleIcon={<ReceiptIcon className="w-5 h-5" />}>
+    <DashboardCard title="Billing Summary" titleIcon={<BillIcon className="w-5 h-5" />}>
       <div className="space-y-3">
         <div>
           <p className="text-sm text-[#8ecdb7]">This Week</p>
