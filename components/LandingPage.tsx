@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ClockIcon, ReceiptIcon, RobotIcon } from './icons';
 
@@ -29,7 +30,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   LexiBill AI
                 </h1>
                 <h2 className="text-white text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
-                  Clarity in Every Bill — Because Happy Clients Matter.
+                  Clarity in Every Bill. Confidence in Every Client.
                 </h2>
               </div>
               <button
@@ -49,7 +50,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               >
                 Key Features
               </h1>
-              <p className="text-white text-base font-normal leading-normal max-w-[720px]">Our system offers a range of features to enhance your billing process.</p>
+              <p className="text-white text-base font-normal leading-normal max-w-[720px]">Our platform offers a range of features to enhance your billing process:</p>
             </div>
             <button
               // Add onClick handler or href if "Learn More" should navigate
@@ -64,8 +65,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 <ClockIcon className="w-[24px] h-[24px]" />
               </div>
               <div className="flex flex-col gap-1">
-                <h2 className="text-white text-base font-bold leading-tight">Automated Time Tracking</h2>
-                <p className="text-[#8ecdb7] text-sm font-normal leading-normal">Effortlessly track billable hours with our AI-powered time tracking.</p>
+                <h2 className="text-white text-base font-bold leading-tight">Streamlined Time Logging</h2>
+                <p className="text-[#8ecdb7] text-sm font-normal leading-normal">Quickly and accurately log your billable hours with our intuitive time entry system.</p>
               </div>
             </div>
             <div className="flex flex-1 gap-3 rounded-lg border border-[#2f6a55] bg-[#17352b] p-4 flex-col">
@@ -73,8 +74,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 <ReceiptIcon className="w-[24px] h-[24px]" />
               </div>
               <div className="flex flex-col gap-1">
-                <h2 className="text-white text-base font-bold leading-tight">Smart Billing</h2>
-                <p className="text-[#8ecdb7] text-sm font-normal leading-normal">Generate accurate invoices and manage billing with ease.</p>
+                <h2 className="text-white text-base font-bold leading-tight">AI-Crafted Narratives</h2>
+                <p className="text-[#8ecdb7] text-sm font-normal leading-normal">Transform your brief task notes into detailed, professional billing narratives using AI.</p>
               </div>
             </div>
             <div className="flex flex-1 gap-3 rounded-lg border border-[#2f6a55] bg-[#17352b] p-4 flex-col">
@@ -82,8 +83,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 <RobotIcon className="w-[24px] h-[24px]" />
               </div>
               <div className="flex flex-col gap-1">
-                <h2 className="text-white text-base font-bold leading-tight">AI Assistance</h2>
-                <p className="text-[#8ecdb7] text-sm font-normal leading-normal">Get instant support and insights from our AI assistant.</p>
+                <h2 className="text-white text-base font-bold leading-tight">Clear Client Invoices</h2>
+                <p className="text-[#8ecdb7] text-sm font-normal leading-normal">Generate professional, easy-to-understand billing reports that build client trust.</p>
               </div>
             </div>
           </div>
@@ -97,7 +98,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 Ready to Transform Your Billing?
               </h1>
               <p className="text-white text-base font-normal leading-normal max-w-[720px] mx-auto"> {/* Added mx-auto */}
-                Get in touch to learn how our system can benefit your legal practice.
+                Get started with LexiBill AI today and experience the future of legal billing.
               </p>
             </div>
             <div className="flex flex-1 justify-center">
