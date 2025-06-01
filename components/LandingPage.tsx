@@ -1,21 +1,32 @@
 import React from 'react';
-import { ClockIcon, ReceiptIcon, RobotIcon } from './icons';
+import { Link } from 'react-router-dom'; // Import Link
+import { ClockIcon, ReceiptIcon, RobotIcon, LexiBillLogoIcon } from './icons'; // Added LexiBillLogoIcon
 
-interface LandingPageProps {
-  onGetStarted: () => void;
-}
-
-const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
+const LandingPage: React.FC<{ onGetStarted: () => void }> = ({ onGetStarted }) => {
   const heroStyle = {
     backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAvNLJVAqGC1dA9kHZeZdTLLXQbXjUXGQRRdAMPUcumpIDqQEvcz5bvDrd1ECt2l-MCN4bflVekrrDhtDgKrshcskCJknhujD894xWMSehrcLzWjPXHG_nf_Xqpm3puSrZOARIgdsC2th84-xTchov0skIhSkr3hmAabXNiLKcFZ39SFr-B67BQZGLwPZqAECx2h5eVPpW6NFeL89N6ugeNi3Fdqe82VfQOlBKKpvBj7Xd8UzZnBPLqPGDZUkCKBhGII4U_BfVQt3Fc")',
   };
 
   return (
     <div
-      className="relative flex size-full min-h-screen flex-col bg-[#10231c] dark justify-between group/design-root overflow-x-hidden"
+      className="relative flex size-full min-h-screen flex-col bg-gradient-to-br from-gray-900 to-green-900 text-white group/design-root overflow-x-hidden"
       // Font family is globally set in index.html body
     >
-      <div>
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 @[480px]:p-6">
+        <div className="flex items-center space-x-3">
+          <LexiBillLogoIcon className="h-10 w-auto" />
+          <span className="text-2xl font-bold">LexiBill.ai</span>
+        </div>
+        <nav className="space-x-6 flex items-center">
+          <Link to="/login" className="hover:text-green-300 transition duration-300">Login</Link>
+          <Link to="/register" className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out">
+            Sign Up
+          </Link>
+        </nav>
+      </div>
+
+      <div> {/* Main Content Wrapper */}
         <div className="@container">
           <div className="@[480px]:p-4">
             <div
@@ -52,7 +63,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               <p className="text-white text-base font-normal leading-normal max-w-[720px]">Our system offers a range of features to enhance your billing process.</p>
             </div>
             <button
-              // Add onClick handler or href if "Learn More" should navigate
+              onClick={onGetStarted} // Changed to also call onGetStarted
               className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#019863] text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] w-fit"
             >
               <span className="truncate">Learn More</span>
