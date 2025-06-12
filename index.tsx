@@ -1,7 +1,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import App from './App'; // Ensured path is relative, .tsx extension removed (TypeScript resolves this)
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

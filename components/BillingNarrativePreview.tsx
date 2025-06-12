@@ -1,12 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-// Removed TimeEntry, Client, Matter imports as specific fields are now in NarrativePreviewData
-import { ArrowLeftIcon, SpinnerIcon, LexiBillLogoIcon } from './icons';
+import { ArrowLeftIcon, SpinnerIcon } from './icons'; 
 
-// This interface now includes all necessary data for preview and subsequent approval,
-// including details for potentially creating a new matter.
 export interface NarrativePreviewData {
-  clientID: string;
+  clientID: string; // Will be the ID of an existing or newly created client
   matterID: string; // Will be the ID of an existing matter or a pre-generated ID for a new one
   date: Date;
   taskSummary: string;
@@ -14,19 +11,19 @@ export interface NarrativePreviewData {
   rate: number;
   notes?: string;
   
-  // Contextual and AI-related data
-  clientName: string; // Name of the client for display
-  matterName: string; // Name of the matter (existing or new) for display and used in narrative
+  clientName: string; 
+  matterName: string; 
   generatedNarrative: string;
 
-  // Flags for handling new matter creation
+  isNewClientPending?: boolean;
+  newClientNameIfPending?: string; 
   isNewMatterPending?: boolean;
-  newMatterNameIfPending?: string; // The name of the new matter, if pending
+  newMatterNameIfPending?: string;
 }
 
 interface BillingNarrativePreviewProps {
   narrativeData: NarrativePreviewData;
-  onApprove: (finalNarrative: string, approvedData: NarrativePreviewData) => void; // Pass full NarrativePreviewData back
+  onApprove: (finalNarrative: string, approvedData: NarrativePreviewData) => void; 
   onCancel: () => void;
   isLoading: boolean;
 }
@@ -44,7 +41,6 @@ const BillingNarrativePreview: React.FC<BillingNarrativePreviewProps> = ({
   }, [narrativeData.generatedNarrative]);
 
   const handleApproveClick = () => {
-    // Pass the full narrativeData object along with the potentially edited narrative
     onApprove(editableNarrative, narrativeData);
   };
   
@@ -64,8 +60,7 @@ const BillingNarrativePreview: React.FC<BillingNarrativePreviewProps> = ({
           <ArrowLeftIcon className="w-6 h-6" />
         </button>
         <div className="flex-1 flex flex-col items-center justify-center py-1">
-          <LexiBillLogoIcon className="h-8 w-8 text-[#8ecdb7] mb-1" />
-          <h1 className="text-white text-xl font-bold leading-tight tracking-[-0.015em]">
+          <h1 className="text-white text-2xl font-bold leading-tight tracking-[-0.015em] pt-2"> 
             Review Billing Narrative
           </h1>
         </div>
@@ -86,16 +81,19 @@ const BillingNarrativePreview: React.FC<BillingNarrativePreviewProps> = ({
             Below is the AI-generated billing narrative based on your task summary. Review it carefully. You can edit the narrative directly in the text area before approving.
           </p>
 
-          {/* Display original entry details for context */}
           <div className="mb-6 p-4 bg-[#214a3c] rounded-lg space-y-2">
             <h3 className="text-lg font-semibold text-white mb-2">Original Entry Details:</h3>
-             <div> {/* Display Client and Matter names from narrativeData */}
+             <div> 
               <span className={`${commonLabelClasses} inline-block mr-2`}>Client:</span>
-              <span className={commonValueClasses}>{narrativeData.clientName}</span>
+              <span className={commonValueClasses}>
+                {narrativeData.clientName} {narrativeData.isNewClientPending ? "(New)" : ""}
+              </span>
             </div>
             <div>
               <span className={`${commonLabelClasses} inline-block mr-2`}>Matter:</span>
-              <span className={commonValueClasses}>{narrativeData.matterName} {narrativeData.isNewMatterPending ? "(New)" : ""}</span>
+              <span className={commonValueClasses}>
+                {narrativeData.matterName} {narrativeData.isNewMatterPending ? "(New)" : ""}
+              </span>
             </div>
             <div>
               <span className={`${commonLabelClasses} inline-block mr-2`}>Date:</span>

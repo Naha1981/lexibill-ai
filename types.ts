@@ -1,4 +1,5 @@
 
+
 export interface Client {
   id: string;
   name: string;
@@ -29,7 +30,8 @@ export interface TimeEntry {
 
 // Data structure for submitting the time entry form
 export interface TimeEntryFormSubmitData {
-  clientID: string;
+  clientID?: string;       // ID if an existing client is chosen/matched
+  newClientName?: string;  // Name if a new client is being created
   matterID?: string;       // ID if an existing matter is chosen/matched from datalist
   newMatterName?: string;  // Name if a new matter is being created (typed directly)
   date: Date;
@@ -39,7 +41,7 @@ export interface TimeEntryFormSubmitData {
   notes?: string;
 }
 
-// --- DASHBOARD SPECIFIC TYPES ---
+// --- DASHBOARD SPECIFIC TYPES (v1) ---
 
 export interface BillingSummary {
   weeklyTotalAmount: number;
@@ -85,4 +87,98 @@ export interface BillingReminder {
   message: string;
   relatedId: string; // ID of the TimeEntry or Matter
   date?: Date; // Relevant date for sorting or display
+}
+
+// --- LEXIBILL AI PRO EDITION TYPES (v2) ---
+
+export interface OutstandingInvoice {
+  id: string;
+  clientName: string;
+  invoiceNumber: string;
+  amountDue: number;
+  dueDate: Date;
+  daysOverdue: number;
+}
+
+export interface RiskAlert {
+  id: string;
+  clientId: string; // Corrected: Assuming this should be clientId not clientName for ID purposes
+  clientName: string;
+  riskDescription: string;
+  suggestedAction?: string;
+}
+
+export interface CollectionTarget {
+  month: string;
+  targetAmount: number;
+  collectedAmount: number;
+}
+
+export interface DashboardSnapshotData {
+  outstandingInvoices: OutstandingInvoice[];
+  riskAlerts: RiskAlert[];
+  collectionTargets: CollectionTarget[];
+}
+
+export type CSVBillingRecord = Record<string, string | number>; // Flexible for various CSV structures
+
+export interface PDFIntakeFile {
+  id: string;
+  fileName: string;
+  fileSize: number;
+  status: 'pending_ocr' | 'ocr_complete' | 'ocr_error';
+  extractedData?: Record<string, any>; // Placeholder for OCR results
+  uploadDate: Date;
+}
+
+export interface AIConsoleMessage {
+  id: string;
+  type: 'user' | 'bot' | 'error';
+  text: string;
+  timestamp: Date;
+  data?: any; // For displaying structured data like tables
+}
+
+// --- CRAIG'S DAILY ROUTINE ENHANCEMENT TYPES ---
+export interface OverdueInvoiceForChase extends OutstandingInvoice {
+  // Can add specific fields needed for chase if different from OutstandingInvoice
+}
+
+export interface DailyReportData {
+  dateGenerated: Date;
+  newEntriesCount: number;
+  totalBilledToday: number; // Mocked for now
+  activeRiskAlerts: RiskAlert[];
+  newOutstandingInvoices: OutstandingInvoice[]; // Today's new overdue items
+}
+
+// --- INTEGRATIONS & AI SETTINGS TYPES ---
+export type IntegrationService = 'quickbooks' | 'stripe' | 'zapier' | 'hubspot' | 'xero' | 'gmail' | 'whatsapp'; // Added more services
+export type IntegrationStatus = 'connected' | 'disconnected' | 'error' | 'coming_soon'; // Added coming_soon
+
+export interface IntegrationSettings {
+  quickbooksStatus: IntegrationStatus;
+  stripeStatus: IntegrationStatus;
+  zapierStatus: IntegrationStatus;
+  hubspotStatus: IntegrationStatus; // Added
+  xeroStatus: IntegrationStatus; // Added
+  gmailStatus: IntegrationStatus; // Added
+  whatsappStatus: IntegrationStatus; // Added
+}
+
+export interface AISettings {
+  enableNarrativeGeneration: boolean; // Corresponds to existing core feature
+  enableSmartChase: boolean;
+  enableTimeEstimation: boolean; // Example from PRD
+  enablePredictiveChurn: boolean; // Added from PRD (Step 6)
+  enableAIInsightsDashboard: boolean; // Added from PRD (Step 6)
+}
+
+// --- MODAL & NOTIFICATION TYPES ---
+export type OAuthServiceType = 'QuickBooks' | 'Stripe' | 'HubSpot' | 'Xero' | 'Gmail'; // Services using OAuth-like flow
+
+export interface ToastNotificationType {
+  id: string;
+  message: string;
+  type: 'success' | 'error' | 'info';
 }

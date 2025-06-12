@@ -2,15 +2,10 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { 
   Client, Matter, TimeEntry, TimeEntryFormSubmitData, 
-  DashboardSnapshotData, CSVBillingRecord, PDFIntakeFile, AIConsoleMessage, OverdueInvoiceForChase, RiskAlert,
-  IntegrationSettings, AISettings, IntegrationService // New types
+  DashboardSnapshotData, CSVBillingRecord, PDFIntakeFile, AIConsoleMessage 
 } from '../types';
 import TimeEntryForm from './TimeEntryForm';
-import { 
-    ArrowLeftIcon, ReceiptIcon, SpinnerIcon, RobotIcon, UploadCloudIcon, FileTextIcon, 
-    MessageSquareIcon, ChevronDownIcon, ChevronUpIcon, AlertTriangleIcon, LightbulbIcon,
-    FileSpreadsheetIcon, FileDigitIcon, SettingsIcon // Added SettingsIcon
-} from './icons'; 
+import { ArrowLeftIcon, ReceiptIcon, SpinnerIcon, RobotIcon, UploadCloudIcon, FileTextIcon, MessageSquareIcon, ChevronDownIcon, ChevronUpIcon } from './icons'; // Added new icons
 import { BOT_NAME } from '../constants';
 
 // Pro Edition Components
@@ -18,8 +13,6 @@ import DashboardSnapshotView from './pro/DashboardSnapshotView';
 import CSVImportView from './pro/CSVImportView';
 import OCRIntakeView from './pro/OCRIntakeView';
 import AIConsoleView from './pro/AIConsoleView';
-import ChurnAnalysisView from './pro/ChurnAnalysisView'; 
-import IntegrationsView from './pro/IntegrationsView'; // New View for Settings
 
 
 interface MainAppViewProps {
@@ -40,38 +33,21 @@ interface MainAppViewProps {
   onPdfFileImport: (files: FileList) => void;
   aiConsoleMessages: AIConsoleMessage[];
   onAIConsoleQuery: (query: string) => void;
-
-  // Craig's Routine Enhancements
-  onOpenSmartChaseModal: (invoice: OverdueInvoiceForChase) => void;
-  onGenerateDailyPdfReport: () => void;
-  onExportFlaggedIssuesCsv: () => void;
-
-  // Integrations & AI Settings Props
-  integrationSettings: IntegrationSettings;
-  aiSettings: AISettings;
-  onIntegrationAction: (service: IntegrationService, action: 'connect' | 'disconnect') => void; // Updated prop
-  onToggleAISetting: (setting: keyof AISettings) => void;
-  onSyncNow: () => void; // New prop for Sync Now button
 }
 
 const MainAppView: React.FC<MainAppViewProps> = ({
   userName, clients, matters, timeEntries,
   onTimeEntrySubmit, onLogout, isLoadingGlobal, onShowReportForMatter,
   dashboardSnapshot, importedCsvRecords, onCsvFileImport,
-  pdfIntakeFiles, onPdfFileImport, aiConsoleMessages, onAIConsoleQuery,
-  onOpenSmartChaseModal, onGenerateDailyPdfReport, onExportFlaggedIssuesCsv,
-  integrationSettings, aiSettings, onIntegrationAction, onToggleAISetting, onSyncNow
+  pdfIntakeFiles, onPdfFileImport, aiConsoleMessages, onAIConsoleQuery
 }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
     timeEntry: false,
     mattersOverview: false,
-    csvImport: false, 
-    ocrIntake: false, 
-    aiConsole: true, 
-    churnAnalysis: true, 
-    dailyReports: true, 
-    integrationsSettings: true, // Open by default for visibility of new features
+    csvImport: true, // Open by default
+    ocrIntake: true, // Open by default
+    aiConsole: true, // Open by default
   });
 
   const toggleSection = (sectionName: string) => {
@@ -81,6 +57,7 @@ const MainAppView: React.FC<MainAppViewProps> = ({
   const handleLogoutClick = async () => {
     setIsLoggingOut(true);
     await onLogout();
+    // isLoggingOut will be reset by parent if navigation occurs or can be reset here if staying on same conceptual page
   };
 
   const clientsWithTheirMatters = useMemo(() => {
@@ -95,6 +72,25 @@ const MainAppView: React.FC<MainAppViewProps> = ({
       }),
     })).sort((a,b) => a.name.localeCompare(b.name));
   }, [clients, matters, timeEntries]);
+
+  const handleMatterSelectFromDashboard = useCallback((matterId: string) => { // Kept for future use if top matters widget returns
+    setExpandedSections(prev => ({ ...prev, mattersOverview: true }));
+    // Scroll and highlight logic (ensure element IDs match)
+    setTimeout(() => { // Ensure section is rendered
+        const elementId = `matter-overview-item-${matterId}`;
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('matter-highlight-animation');
+          setTimeout(() => element.classList.remove('matter-highlight-animation'), 1800);
+          const detailsElement = element.closest('details');
+          if (detailsElement && !detailsElement.open) {
+            const parentDetails = element.closest('.matter-item-container')?.querySelector('details');
+            if (parentDetails && !parentDetails.open) parentDetails.open = true;
+          }
+        }
+    }, 100);
+  }, []);
 
   const SectionHeader: React.FC<{ title: string; sectionKey: string; icon?: React.ReactNode }> = ({ title, sectionKey, icon }) => (
     <div 
@@ -138,75 +134,10 @@ const MainAppView: React.FC<MainAppViewProps> = ({
            </div>
         )}
         
-        <DashboardSnapshotView snapshotData={dashboardSnapshot} onInitiateSmartChase={onOpenSmartChaseModal} />
+        {/* Pro Edition Dashboard Snapshot */}
+        <DashboardSnapshotView snapshotData={dashboardSnapshot} />
 
-        <section className="bg-[#122720] p-4 sm:p-6 rounded-xl shadow-lg border border-[#2f6a55]">
-            <SectionHeader title="AI Console" sectionKey="aiConsole" icon={<MessageSquareIcon className="w-6 h-6" />} />
-            {expandedSections.aiConsole && (
-                <div id="section-content-aiConsole" className="mt-4">
-                    <AIConsoleView 
-                        messages={aiConsoleMessages} 
-                        onSendMessage={onAIConsoleQuery} 
-                        isLoading={isLoadingGlobal} 
-                    />
-                </div>
-            )}
-        </section>
-        
-        <section className="bg-[#122720] p-4 sm:p-6 rounded-xl shadow-lg border border-[#2f6a55]">
-             <SectionHeader title="Client Risk & Churn Analysis" sectionKey="churnAnalysis" icon={<AlertTriangleIcon className="w-6 h-6" />} />
-            {expandedSections.churnAnalysis && (
-                <div id="section-content-churnAnalysis" className="mt-4">
-                    <ChurnAnalysisView riskAlerts={dashboardSnapshot.riskAlerts} />
-                </div>
-            )}
-        </section>
-
-        <section className="bg-[#122720] p-4 sm:p-6 rounded-xl shadow-lg border border-[#2f6a55]">
-            <SectionHeader title="Daily Reports & Exports" sectionKey="dailyReports" icon={<FileTextIcon className="w-6 h-6" />} />
-            {expandedSections.dailyReports && (
-                <div id="section-content-dailyReports" className="mt-4 space-y-3">
-                    <button 
-                        onClick={onGenerateDailyPdfReport}
-                        className="w-full flex items-center justify-center p-3 bg-[#017a50] text-white rounded-lg hover:bg-[#019863] transition-colors"
-                        aria-label="Generate Daily PDF Summary Report"
-                    >
-                        <FileDigitIcon className="w-5 h-5 mr-2" /> Generate Daily PDF Summary (Stubbed)
-                    </button>
-                    <button 
-                        onClick={onExportFlaggedIssuesCsv}
-                        className="w-full flex items-center justify-center p-3 bg-[#017a50] text-white rounded-lg hover:bg-[#019863] transition-colors"
-                        aria-label="Export Flagged Issues as CSV"
-                    >
-                        <FileSpreadsheetIcon className="w-5 h-5 mr-2" /> Export Flagged Issues (CSV)
-                    </button>
-                     <button 
-                        onClick={() => alert("AI Voice Note summary generation is a future feature.")}
-                        className="w-full flex items-center justify-center p-3 bg-[#2a5c4a] text-white rounded-lg hover:bg-[#316d58] transition-colors"
-                        aria-label="Get AI Voice Note Summary (Future Feature)"
-                    >
-                        <LightbulbIcon className="w-5 h-5 mr-2" /> Get AI Voice Note Summary (Future)
-                    </button>
-                </div>
-            )}
-        </section>
-
-        <section className="bg-[#122720] p-4 sm:p-6 rounded-xl shadow-lg border border-[#2f6a55]">
-            <SectionHeader title="Integrations & AI Settings" sectionKey="integrationsSettings" icon={<SettingsIcon className="w-6 h-6" />} />
-            {expandedSections.integrationsSettings && (
-                <div id="section-content-integrationsSettings" className="mt-4">
-                    <IntegrationsView 
-                        integrationSettings={integrationSettings}
-                        aiSettings={aiSettings}
-                        onIntegrationAction={onIntegrationAction}
-                        onToggleAISetting={onToggleAISetting}
-                        isLoading={isLoadingGlobal}
-                        onSyncNow={onSyncNow}
-                    />
-                </div>
-            )}
-        </section>
-
+        {/* --- Collapsible Sections for Pro Features --- */}
         <section className="bg-[#122720] p-4 sm:p-6 rounded-xl shadow-lg border border-[#2f6a55]">
             <SectionHeader title="Import Billing Data (CSV)" sectionKey="csvImport" icon={<UploadCloudIcon className="w-6 h-6" />} />
             {expandedSections.csvImport && (
@@ -221,12 +152,25 @@ const MainAppView: React.FC<MainAppViewProps> = ({
         </section>
 
         <section className="bg-[#122720] p-4 sm:p-6 rounded-xl shadow-lg border border-[#2f6a55]">
-             <SectionHeader title="PDF Invoice OCR Intake" sectionKey="ocrIntake" icon={<FileDigitIcon className="w-6 h-6" />} />
+             <SectionHeader title="PDF Invoice OCR Intake" sectionKey="ocrIntake" icon={<FileTextIcon className="w-6 h-6" />} />
             {expandedSections.ocrIntake && (
                 <div id="section-content-ocrIntake" className="mt-4">
                     <OCRIntakeView 
                         onFileChange={onPdfFileImport} 
                         uploadedFiles={pdfIntakeFiles} 
+                        isLoading={isLoadingGlobal} 
+                    />
+                </div>
+            )}
+        </section>
+
+        <section className="bg-[#122720] p-4 sm:p-6 rounded-xl shadow-lg border border-[#2f6a55]">
+            <SectionHeader title="Ask LexiBill AI" sectionKey="aiConsole" icon={<MessageSquareIcon className="w-6 h-6" />} />
+            {expandedSections.aiConsole && (
+                <div id="section-content-aiConsole" className="mt-4">
+                    <AIConsoleView 
+                        messages={aiConsoleMessages} 
+                        onSendMessage={onAIConsoleQuery} 
                         isLoading={isLoadingGlobal} 
                     />
                 </div>
